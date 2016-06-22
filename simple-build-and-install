@@ -95,16 +95,16 @@ echo "Compiling ..."
 make -j "$( nproc )"
 cd ..
 
-if [ x"$( uname -m )" = x"x86_64" ]; then
-	mkdir -p build32
-	cd build32
-	echo "Configuring 32-bit GLInject library ..."
-	CC="gcc -m32" CXX="g++ -m32" PKG_CONFIG_PATH="$LIB32DIR/pkgconfig" \
-		../configure --prefix=/usr --libdir=$LIB32DIR --disable-ssrprogram $CONFIGURE_OPTIONS "$@"
-	echo "Compiling 32-bit GLInject library ..."
-	make -j "$( nproc )"
-	cd ..
-fi
+#if [ x"$( uname -m )" = x"x86_64" ]; then
+	#mkdir -p build32
+	#cd build32
+	#echo "Configuring 32-bit GLInject library ..."
+	#CC="gcc -m32" CXX="g++ -m32" PKG_CONFIG_PATH="$LIB32DIR/pkgconfig" \
+		#../configure --prefix=/usr --libdir=$LIB32DIR --disable-ssrprogram $CONFIGURE_OPTIONS "$@"
+	#echo "Compiling 32-bit GLInject library ..."
+	#make -j "$( nproc )"
+	#cd ..
+#fi
 
 echo "Removing old SSR libraries ..."
 sudo rm -f "/usr/lib/libssr-glinject."*
@@ -119,12 +119,12 @@ echo "Installing ..."
 sudo make install
 cd ..
 
-if [ x$( uname -m ) = x"x86_64" ]; then
-	cd build32
-	echo "Installing 32-bit GLInject library ..."
-	sudo make install
-	cd ..
-fi
+#if [ x$( uname -m ) = x"x86_64" ]; then
+	#cd build32
+	#echo "Installing 32-bit GLInject library ..."
+	#sudo make install
+	#cd ..
+#fi
 
 echo "Running post-install script ..."
 sudo ./postinstall
