@@ -18,6 +18,8 @@ along with SimpleScreenRecorder.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "MainWindow.h"
+#include <csignal>
+#include <sys/socket.h>
 
 #include "Main.h"
 #include "Icons.h"
@@ -38,8 +40,18 @@ ENUMSTRINGS(MainWindow::enum_nvidia_disable_flipping) = {
 
 const QString MainWindow::WINDOW_CAPTION = "SimpleScreenRecorder";
 
+int MainWindow::sigtermFd[2];
+
 MainWindow::MainWindow()
 	: QMainWindow() {
+
+	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigtermFd))
+		qFatal("Couldn't create TERM socketpair");
+
+	snTerm = new QSocketNotifier(sigtermFd[1], QSocketNotifier::Read, this);
+	connect(snTerm, SIGNAL(activated(int)), this, SLOT(handleSigTerm()));
+
+	setup_unix_signal_handlers();
 
 	m_old_geometry = QRect();
 
@@ -181,4 +193,33 @@ void MainWindow::OnSysTrayActivated(QSystemTrayIcon::ActivationReason reason) {
 	if(reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick) {
 		OnShowHide();
 	}
+}
+
+void MainWindow::termSignalHandler(int) {
+	char a = 1;
+	::write(sigtermFd[0], &a, sizeof(a));
+}
+
+void MainWindow::handleSigTerm() {
+	snTerm->setEnabled(false);
+	char tmp;
+	::read(sigtermFd[1], &tmp, sizeof(tmp));
+
+	Logger::LogInfo("[MainWindow::handleSigTerm] " + tr("Received signal SIGTERM..."));
+
+	snTerm->setEnabled(true);
+}
+
+static int setup_unix_signal_handlers() {
+	struct sigaction term;
+
+	term.sa_handler = MainWindow::termSignalHandler;
+	sigemptyset(&term.sa_mask);
+	term.sa_flags = 0;
+	term.sa_flags |= SA_RESTART;
+
+	if (sigaction(SIGTERM, &term, 0) > 0)
+		return 1;
+
+	return 0;
 }

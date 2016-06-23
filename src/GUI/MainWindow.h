@@ -19,6 +19,10 @@ along with SimpleScreenRecorder.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include "Global.h"
+#include "Logger.h"
+#include <QSocketNotifier>
+#include "signal.h"
+#include "sys/socket.h"
 
 class PageWelcome;
 class PageInput;
@@ -52,6 +56,10 @@ private:
 	PageRecord *m_page_record;
 	PageDone *m_page_done;
 
+	static int sigtermFd[2];
+
+	QSocketNotifier *snTerm;
+
 public:
 	MainWindow();
 	~MainWindow();
@@ -60,6 +68,8 @@ public:
 	void SaveSettings();
 
 	bool Validate();
+
+	static void termSignalHandler(int unused);
 
 protected:
 	virtual void closeEvent(QCloseEvent* event) override;
@@ -82,4 +92,8 @@ public slots:
 	void OnShowHide();
 	void OnSysTrayActivated(QSystemTrayIcon::ActivationReason reason);
 
+	void handleSigTerm();
+
 };
+
+static int setup_unix_signal_handlers();
