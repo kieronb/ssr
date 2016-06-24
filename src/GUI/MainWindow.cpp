@@ -112,6 +112,15 @@ MainWindow::MainWindow()
 		show();
 	m_page_record->UpdateShowHide();
 
+	// if autostart, cycle through all of the pages to get all settings in place,
+	// then begin recording using defaults from conf file
+	if(g_option_autostart) {
+		GoPageInput();
+		GoPageOutput();
+		GoPageRecord();
+		m_page_record->StartOutput();
+	}
+
 }
 
 MainWindow::~MainWindow() {
@@ -207,7 +216,11 @@ void MainWindow::handleSigTerm() {
 
 	Logger::LogInfo("[MainWindow::handleSigTerm] " + tr("Received signal SIGTERM..."));
 
+	m_page_record->StopPage(true);
+
 	snTerm->setEnabled(true);
+
+	exit(0);
 }
 
 static int setup_unix_signal_handlers() {

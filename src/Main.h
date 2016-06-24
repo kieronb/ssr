@@ -25,6 +25,7 @@ extern QString g_option_statsfile;
 extern bool g_option_syncdiagram;
 extern bool g_option_systray;
 extern bool g_option_start_hidden;
+extern bool g_option_autostart;
 
 QString GetApplicationSystemDir(const QString& subdir = QString());
 QString GetApplicationUserDir(const QString& subdir = QString());

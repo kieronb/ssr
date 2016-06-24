@@ -33,6 +33,7 @@ bool g_option_syncdiagram = false;
 bool g_option_systray = true;
 bool g_option_start_hidden = false;
 bool g_option_benchmark = false;
+bool g_option_autostart = false;
 
 void PrintOptionHelp() {
 	Logger::LogInfo(
@@ -48,6 +49,8 @@ void PrintOptionHelp() {
 				"  --syncdiagram       Show synchronization diagram (for debugging).\n"
 				"  --no-systray        Don't show the system tray icon.\n"
 				"  --start-hidden      Start the application in hidden form.\n"
+				"  --autostart         Begin recording using settings in config file.\n"
+				"                      (default: ~/.ssr/settings.conf).\n"
 	);
 }
 
@@ -143,6 +146,9 @@ int main(int argc, char* argv[]) {
 			} else if(option == "--start-hidden") {
 				NOVALUE
 				g_option_start_hidden = true;
+			} else if(option == "--autostart") {
+				NOVALUE
+				g_option_autostart = true;
 			} else if(option == "--benchmark") {
 				NOVALUE
 				g_option_benchmark = true;
